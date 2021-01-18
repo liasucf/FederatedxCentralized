@@ -8,6 +8,6 @@ Pillow == 6.2.2
 torch
 -f https://github.com/KumaTea/pytorch-aarch64/releases/download/v1.6.0/torchvision-0.7.0-cp37-cp37m-linux_aarch64.whl
 torchvision
-syft == 0.2.6
+syft 
 psutil == 5.7.0
 skorch == 0.8.0
