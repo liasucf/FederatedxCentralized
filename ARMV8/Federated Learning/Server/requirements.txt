@@ -2,10 +2,10 @@ pandas == 1.0.5
 numpy == 1.18.5
 matplotlib
 Pillow == 6.2.2
--f https://download.pytorch.org/whl/torch_stable.html 
-torch==1.4.0+cpu 
--f https://download.pytorch.org/whl/torch_stable.html 
-torchvision==0.5.0+cpu
+-f https://github.com/KumaTea/pytorch-aarch64/releases/download/v1.6.0/torch-1.6.0-cp37-cp37m-linux_aarch64.whl
+torch
+-f https://github.com/KumaTea/pytorch-aarch64/releases/download/v1.6.0/torchvision-0.7.0-cp37-cp37m-linux_aarch64.whl
+torchvision
 syft == 0.2.6
 psutil == 5.7.0
 skorch == 0.8.0
