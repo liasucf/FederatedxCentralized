@@ -19,6 +19,8 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import TimeSeriesSplit
+from skorch.callbacks import EarlyStopping
+from skorch import NeuralNetRegressor
 from math import sqrt
 import itertools
 
@@ -58,8 +60,15 @@ def secs2hours(secs):
 class Arguments:
     def __init__(self):
         self.data = sys.argv[1]
-        self.communication_rounds = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+        self.communication_rounds = int(sys.argv[2]) if len(sys.argv) > 2 else 5
+        self.epochs = int(float(sys.argv[3])) if len(sys.argv) > 3 else 200
         self.seed = 1
+        self.lr = 0.01
+        self.batch_size = 8
+        self.patience = 100
+        self.momentum =  0.09
+        self.threshold = 0.0003
+        
 
 # split a multivariate sequence into samples
 def split_sequences(sequences, n_steps_in, n_steps_out):
@@ -93,7 +102,7 @@ p.cpu_percent(interval=None)
 
 # ### Charging the data
 ## Loading data incrementaly 
-data = pd.read_csv('../Data/'+args.number +'.csv', sep=',')
+data = pd.read_csv('Data/'+args.data +'.csv', sep=',')
 
 
 data['Time'] = pd.to_datetime(data['Time'], format='%Y-%m-%d %H:%M:%S')
@@ -123,11 +132,9 @@ X, y = split_sequences(values, n_steps_in, n_steps_out)
 n_timesteps, n_features, n_outputs = X.shape[1], X.shape[2], y.shape[1]
 n_input = n_timesteps * n_features
 X = X.reshape((X.shape[0], n_input))
-
 tscv = TimeSeriesSplit(n_splits=args.communication_rounds)
 generator = tscv.split(X)
-
-host = "127.0.0.1"
+host = "172.18.0.2"
 port = 8000
 
 #Making a socket for communication and connecting with the server
@@ -166,9 +173,8 @@ while True:
         current_round = current_round + 1
         print(current_round)
         result = next(itertools.islice(generator, current_round))
-
         train_index, test_index = result[0], result[1]
-        print(test_index)
+
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
         
@@ -180,7 +186,6 @@ while True:
         ax.legend();
         fig_split.savefig('train_test_split_plot'+str(number)+'.png', bbox_inches='tight')
         
-        print(X_train.shape, y_train.shape)
         # identify outliers in the training dataset
         lof = LocalOutlierFactor()
         yhat = lof.fit_predict(X_train)
@@ -188,7 +193,6 @@ while True:
         mask = yhat != -1
         X_train, y_train = X_train[mask, :], y_train[mask]
         # summarize the shape of the updated training dataset
-        print(X_train.shape, y_train.shape)
 
 
         y_class_test = np.array(data['class'].to_list())[test_index]
@@ -214,8 +218,22 @@ while True:
     
         model = pickle.load(open('model_rec.sav', 'rb'))
         
+        
+        early = EarlyStopping(patience=args.patience, threshold= args.threshold )
+
+        #Using the model with the NeuralNetRegressor to configure parameters
+        net = NeuralNetRegressor(
+        model,
+        max_epochs=args.epochs,
+        lr=args.lr,
+        batch_size = args.batch_size,
+        optimizer__momentum=args.momentum,
+        iterator_train__shuffle=False,
+        iterator_valid__shuffle=False,
+        callbacks=[early])
+        
         start_training = time.time()
-        model.fit(X_train, y_train)
+        net.fit(X_train, y_train)
 
         #saving the training time
         b = open("train_temps.txt", "a+")
@@ -225,9 +243,9 @@ while True:
         
         # visualize the loss as the network trained
         # plotting training and validation loss
-        epochs = [i for i in range(len(model.history))]
-        train_loss = model.history[:,'train_loss']
-        valid_loss = model.history[:,'valid_loss']
+        epochs = [i for i in range(len(net.history))]
+        train_loss = net.history[:,'train_loss']
+        valid_loss = net.history[:,'valid_loss']
         
         fig = plt.figure(figsize=(25,10))
         plt.plot(epochs,train_loss,'g-');
@@ -238,7 +256,7 @@ while True:
         plt.legend(['Train','Validation']);
         fig.savefig('loss_plot'+str(number)+'.png', bbox_inches='tight')
 
-        y_pred = model.predict(X_test)
+        y_pred = net.predict(X_test)
         
         a = open("test_losses.txt", "a+")
         a.write("Number: " + str(number) + '\n')
@@ -271,6 +289,17 @@ while True:
         h.close()
 
         increment = increment - 1
+    param = 0
+    if current_round == 2:
+        if (model.parameters() == param):
+            print("TRUEEE LASCOUUU")
+            print(param)
+            print(model.parameters())
+        else:
+            print("FALSE LIA VDB")
+
+    print(model.parameters())
+    param = model.parameters()
     
     #Collecting the information of memory and CPU usage
     z = open("memory_cpu.txt", "a+")
@@ -279,12 +308,13 @@ while True:
     z.write('physical memory use: (in MB)'+ str(p.memory_info()[0]/2.**20))
     z.write('percentage utilization of this process in the system '+ str(p.cpu_percent(interval=None))+ '\n')
     z.close()
+        
+    
     
     #Saving the model updated
     number = number + 1
     filename = 'model.sav'
     pickle.dump(model, open(filename, 'wb'))
-    print(model)
 
     #Sending the updated model to the server    
     with open("model.sav", "rb") as r:

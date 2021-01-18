@@ -13,12 +13,11 @@ RUN pip install -r requirements.txt
 COPY . /opt/app
 
 #creates work dir   
-WORKDIR /app
-WORKDIR /app/Data
+WORKDIR /
 #copy python script to the container folder app
-COPY LSTM.py /app/LSTM.py
-ADD Data /app/Data/
-RUN chmod +x /app/LSTM.py
+COPY client_centralized_lstm.py client_centralized_lstm.py
+ADD Data Data/
+RUN chmod +x client_centralized_lstm.py
 
 
-CMD python /app/LSTM.py $DATA_ENV $ROUNDS_ENV
+CMD python client_centralized_lstm.py $DATA_ENV $ROUNDS_ENV

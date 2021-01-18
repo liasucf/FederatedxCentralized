@@ -13,8 +13,6 @@ import torch.nn as nn
 import time
 import pickle
 from syft.frameworks.torch.fl import utils
-from skorch.callbacks import EarlyStopping
-from skorch import NeuralNetRegressor
 from numpy.random import seed
 import numpy as np 
 #import subprocess
@@ -68,18 +66,8 @@ class Arguments:
         #if there is no parameters passed the default is 6 
         self.n_clients = int(sys.argv[2])  if len(sys.argv) > 2 else 6
         #if there is no parameters passed the default is 500 
-        self.epochs = int(float(sys.argv[3])) if len(sys.argv) > 3 else 200
-
         self.layers = 1
         self.units = 10
-        self.lr = 0.01
-        self.test_batch_size = 8
-        self.batch_size = 8
-        self.log_interval = 10
-        self.seed = 1
-        self.patience = 100
-        self.momentum =  0.09
-        self.threshold = 0.0003
 
 
 #Funtion to send the last model for all the clients that are connected to the server
@@ -187,26 +175,13 @@ n_input = n_timesteps * n_features
 #Initialize the model
 initial_model = LSTM(n_input, args.units, args.layers, n_outputs)
 #Defining the ealy stopping method
-early = EarlyStopping(patience=args.patience, threshold= args.threshold )
-
-#Using the model with the NeuralNetRegressor to configure parameters
-net = NeuralNetRegressor(
-initial_model,
-max_epochs=args.epochs,
-lr=args.lr,
-batch_size = args.batch_size,
-optimizer__momentum=args.momentum,
-iterator_train__shuffle=False,
-iterator_valid__shuffle=False,
-callbacks=[early])
-#Initialize the model
 
 #Saving the  model in a file
 filename = 'initial_model.sav'
-pickle.dump(net, open(filename, 'wb'))
+pickle.dump(initial_model, open(filename, 'wb'))
 
 #Defining the ip and port of the server that the clients will connect with
-host = "127.0.0.1"
+host = "172.18.0.2"
 port = 8000
   
 #Making a socket to open communication
@@ -289,10 +264,11 @@ while epoch < args.communication_rounds - 1:
     r.write('percentage utilization of this process in the system' + str(p.cpu_percent(interval=None))+ '\n')
     r.close()
     #Loading all the updated models received from the clients -we have for beacause we trained with 4 clients- 
-    try:
-        for i in range(args.n_clients):
-            models[i] = pickle.load(open('model'+str(i)+'.sav', 'rb'))
-        continue
+    
+    for i in range(int(0.7*len(clients))):
+        print(i)
+        models[i] = pickle.load(open('model'+str(i)+'.sav', 'rb'))
+    
 
     #doing the federated avg
     federated_model = utils.federated_avg(models)

@@ -3,10 +3,14 @@
 FROM python:3.7-stretch
 
 ARG communication_rounds
-ENV ROUNDS_ENV=${communication_rounds}
 ARG n_clients
-ENV CLIENTS_ENV=${n_clients}
 ARG n_epochs
+
+
+ENV ROUNDS_ENV=${communication_rounds}
+
+ENV CLIENTS_ENV=${n_clients}
+
 ENV EPOCHS_ENV=${n_epochs}
 
 COPY requirements.txt /opt/app/requirements.txt
@@ -22,5 +26,5 @@ COPY server_lstm.py /app/server_lstm.py
 RUN chmod +x /app/server_lstm.py
 
 
-CMD python /app/LSTM.py $ROUNDS_ENV $CLIENTS_ENV $EPOCHS_ENV
+CMD python /app/server_lstm.py $ROUNDS_ENV $CLIENTS_ENV $EPOCHS_ENV
 
