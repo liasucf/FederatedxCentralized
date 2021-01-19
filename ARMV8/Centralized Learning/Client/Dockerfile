@@ -1,6 +1,6 @@
 #!/bin/bash
 #Set the base image
-FROM arm64v8/python:3.7-stretch
+FROM arm64v8/python:3.7.9-stretch
 
 ARG data
 ENV DATA_ENV=${data}
