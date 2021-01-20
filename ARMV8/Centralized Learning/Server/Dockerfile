@@ -21,20 +21,14 @@ WORKDIR /opt/app
 RUN apt-get update
 
 RUN apt-get install -y \
-    ffmpeg  python3-dev build-essential python-dev pkg-config libc-dev python-setuptools  libfreetype6-dev  libpng-dev libjpeg-dev\
-    freetype* libblas-dev liblapack-dev libicu-dev musl-dev libssl-dev  libffi6 libffi-dev gcc  g++ libxml2 unixodbc unixodbc-dev  gfortran cmake 
+    ffmpeg  python3-dev build-essential pkg-config libc-dev python-setuptools  libfreetype6-dev  libpng-dev libjpeg-dev\
+    freetype* libblas-dev liblapack-dev libicu-dev musl-dev libssl-dev  libffi6 libffi-dev gcc  g++ libxml2 unixodbc unixodbc-dev  gfortran 
 
 # Library components
 RUN apt-get install -y \
     libavformat-dev libavcodec-dev libavdevice-dev \
-    libavutil-dev libswscale-dev libswresample-dev libavfilter-dev
-
-RUN apt-get -y install python3-cffi python3-numpy libatlas-base-dev \
-      portaudio19-dev python3-lxml\
-     libxml2-dev libxslt1-dev zlib1g-dev libpq-dev python3-wheel \
-     autoconf libtool python-opengl python-pil python-pyrex  idle-python2.7 \
-     qt4-dev-tools qt4-designer libqtgui4 libqtcore4 libqt4-xml libqt4-test libqt4-script libqt4-network libqt4-dbus\
-    python-qt4 python-qt4-gl libgle3  libopus-dev libvpx-dev libsrtp2-dev
+    libavutil-dev libswscale-dev libswresample-dev libavfilter-dev \
+    libgle3  libopus-dev libvpx-dev libsrtp2-dev
 
 
 RUN pip3 install Pillow
