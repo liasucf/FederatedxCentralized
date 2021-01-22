@@ -1,9 +1,4 @@
-Pillow
--f https://github.com/KumaTea/pytorch-aarch64/releases/download/v1.6.0/torch-1.6.0-cp37-cp37m-linux_aarch64.whl
-torch
--f https://github.com/KumaTea/pytorch-aarch64/releases/download/v1.6.0/torchvision-0.7.0-cp37-cp37m-linux_aarch64.whl
-torchvision
-av
+
 aiortc==0.9.28
 pandas == 1.0.5
 numpy == 1.18.5
