@@ -21,7 +21,10 @@ RUN apt-get install -y \
     libavutil-dev libswscale-dev libswresample-dev libavfilter-dev \
     libgle3  libopus-dev libvpx-dev libsrtp2-dev
 
-
+RUN pip3 install Pillow
+RUN  python3 -m pip install  https://github.com/KumaTea/pytorch-aarch64/releases/download/v1.6.0/torch-1.6.0-cp38-cp38-linux_aarch64.whl
+RUN python3 -m pip install  https://github.com/KumaTea/pytorch-aarch64/releases/download/v1.6.0/torchvision-0.7.0-cp38-cp38-linux_aarch64.whl
+RUN python3 -m pip install av
     
 RUN pip install -r requirements.txt
 COPY . /opt/app
