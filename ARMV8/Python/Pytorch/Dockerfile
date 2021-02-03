@@ -13,7 +13,6 @@ ENV CLIENTS_ENV=${n_clients}
 
 ENV EPOCHS_ENV=${n_epochs}
 
-COPY requirements.txt requirements.txt
 
 #install requirements for torch
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -23,16 +22,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          curl \
          ca-certificates \
          libjpeg-dev \
-         libpng-dev gfortran liblapack-dev libopenblas-dev && \
-     rm -rf /var/lib/apt/lists/*
+         libpng-dev gfortran liblapack-dev libopenblas-dev  pkg-config libffi-dev  libssl-dev 
+     #rm -rf /var/lib/apt/lists/*
 
 RUN apt-get -y dist-upgrade
 
 # Library components
-#RUN apt-get install -y \
-#    libavformat-dev libavcodec-dev libavdevice-dev libstdc++6 \
-#    libavutil-dev libswscale-dev libswresample-dev libavfilter-dev \
-#    libgle3  libopus-dev libvpx-dev libsrtp2-dev
+RUN apt-get install -y \
+    libavformat-dev libavcodec-dev libavdevice-dev libstdc++6 \
+    libavutil-dev libswscale-dev libswresample-dev libavfilter-dev \
+    libgle3  libopus-dev libvpx-dev libsrtp2-dev
 
 RUN pip install cython hypothesis pyyaml pillow six
 
@@ -50,18 +49,28 @@ ENV BUILD_TEST=0
 
 WORKDIR /app
 # clone repo and build torch
-RUN git clone https://github.com/pytorch/pytorch.git && cd ./pytorch && git submodule update --init --recursive && \
-    pip install -r requirements.txt && python -E setup.py build
+RUN git clone --branch v1.7.0 https://github.com/pytorch/pytorch.git  pytorch-1.7.0 && echo $(ls) && cd pytorch-1.7.0 && git submodule update --init --recursive && \
+    pip install -r requirements.txt && python -E setup.py install
 
 # copy built modules to site packages (for some reason, the built modules were not copied to site packages)
-RUN cp -r /app/pytorch/build/lib.linux-aarch64-3.9/* /usr/local/lib/python3.9/site-packages/
+RUN echo $(/app/pytorch-1.7.0/build)
+RUN cp -r /app/pytorch-1.7.0/build/lib.linux-aarch64-3.9/* /usr/local/lib/python3.9/site-packages/
 
 RUN echo $(python -c "import torch")
 
 #Intalling torchvision by wheel
-RUN python3 -m pip install  https://github.com/KumaTea/pytorch-aarch64/releases/download/v1.7.1/torchvision-0.8.2-cp38-cp38-linux_aarch64.whl
+#RUN python3 -m pip install  torchvision
+RUN git clone --recursive https://github.com/pytorch/vision && cd vision && git checkout v0.5.0 && python3 setup.py install
+
+#RUN apt-get install -y  pkg-config libffi-dev  libssl-dev
+#RUN apt-get install -y \
+#    libavformat-dev libavcodec-dev libavdevice-dev libstdc++6 \
+#    libavutil-dev libswscale-dev libswresample-dev libavfilter-dev \
+#    libgle3  git libopus-dev libvpx-dev libsrtp2-dev
 RUN python3 -m pip install av
 #Installing pip requirements
+COPY requirements.txt requirements.txt
+
 RUN pip install -r requirements.txt
 
 #creates work dir
@@ -70,7 +79,7 @@ COPY server_lstm.py server_lstm.py
 
 
 # clean up
-RUN rm -rf /app
+#RUN rm -rf /app
 
 RUN chmod +x server_lstm.py
 
