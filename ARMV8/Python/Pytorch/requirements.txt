@@ -1,7 +1,6 @@
 aiortc
 pandas 
-numpy
-matplotlib 
-psutil 
-skorch
-syft==0.2.9
+matplotlib
+psutil
+skorch 
+seaborn
