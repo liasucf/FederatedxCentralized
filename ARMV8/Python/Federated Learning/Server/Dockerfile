@@ -34,32 +34,19 @@ RUN pip install numpy==1.18.5
 
 ENV LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu/openblas/libblas.so
 
-#ENV USE_LAPACK=1
-#ENV USE_CUDA=0
-#ENV USE_FBGEMM=0
-#ENV USE_DISTRIBUTED=0
-#ENV BUILD_TEST=0
-
 WORKDIR /app
-# clone repo and build torch
-#RUN git clone --branch v1.4.0a0 https://github.com/pytorch/pytorch.git  pytorch-1.4.0 && echo $(ls) && cd pytorch-1.4.0 && git submodule sync && git submodule update --init --recursive && \
-#    pip install -r requirements.txt && python -E setup.py bdist_wheel
 
-#RUN mv /app/pytorch-1.4.0/dist/torch-1.4.0a0+2c51e06-cp36-cp36m-linux_aarch64.whl  /app/pytorch-1.4.0/dist/torch-1.4.0-cp36-cp36m-linux_aarch64.whl
-#RUN pip3 install /app/pytorch-1.4.0/dist/torch-1.4.0-cp36-cp36m-linux_aarch64.whl
-RUN  python3 -m pip install https://github.com/liasucf/Auxiliar/blob/main/torch-1.4.0-cp36-cp36m-linux_aarch64.whl
-RUN cp -r /app/pytorch-1.4.0/build/lib.linux-aarch64-3.6/* /usr/local/lib/python3.6/site-packages/
-
+RUN  python3 -m pip install https://github.com/liasucf/Auxiliar/raw/main/torch-1.4.0-cp36-cp36m-linux_aarch64.whl
 
 #Intalling torchvision by wheel
-#RUN git clone --recursive https://github.com/pytorch/vision && cd vision && git checkout v0.5.0 && python3 setup.py install
-RUN  python3 -m pip install https://github.com/liasucf/Auxiliar/blob/main/torchvision-0.5.0-cp36-cp36m-linux_aarch64.whl
+RUN  python3 -m pip install https://github.com/liasucf/Auxiliar/raw/main/torchvision-0.5.0-cp36-cp36m-linux_aarch64.whl
 RUN python3 -m pip install av
 #Installing pip requirements
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-RUN pip3 install tblib syft_proto websocket websockets phe
+RUN pip3 install tblib syft_proto websocket websockets phe requests
+
 RUN pip3 install --no-dependencies syft==0.2.6
 
 #creates work dir
