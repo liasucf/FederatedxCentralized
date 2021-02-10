@@ -23,8 +23,7 @@ By default this number is 6
 ## To run the docker container of the server
 
 docker build . -t server_fed      
-docker run -e ROUNDS_ENV=<number_communication_rounds> -e CLIENTS_ENV=<n_clients> -p 8000:8000 --mount source=myvol2,target=/app -it server_fed        
-
+docker run -e ROUNDS_ENV=<number_communication_rounds> -e CLIENTS_ENV=<n_clients> -p 80:80 -v /home/ec2-user/federated/server:/app -it server_fed
 ## To run the docker container of the client 
 
 docker build . -t client_fed        
