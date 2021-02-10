@@ -181,8 +181,8 @@ filename = 'initial_model.sav'
 pickle.dump(initial_model, open(filename, 'wb'))
 
 #Defining the ip and port of the server that the clients will connect with
-host = "172.18.0.2"
-port = 8000
+host = "0.0.0.0"
+port = 80
   
 #Making a socket to open communication
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM) 
@@ -216,9 +216,9 @@ z = open("battery_power_in_execution.txt", "a+")
 
 #Battery percentage charge
 
-battery = psutil.sensors_battery()
-z.write("charge = %s%%, time left = %s" % (battery.percent, secs2hours(battery.secsleft))+ '\n')
-z.close()
+#battery = psutil.sensors_battery()
+#z.write("charge = %s%%, time left = %s" % (battery.percent, secs2hours(battery.secsleft))+ '\n')
+#z.close()
 
 #Record all the clients connected and their ip adress in a file 
 r = open("clients.txt", "a+")
