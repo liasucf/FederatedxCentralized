@@ -23,12 +23,12 @@ By default this number is 6
 ## To run the docker container of the server
 
 docker build . -t server_fed      
-docker run -e ROUNDS_ENV=<number_communication_rounds> -e CLIENTS_ENV=<n_clients> -p 8000:8000 -it server_fed        
+docker run -e ROUNDS_ENV=<number_communication_rounds> -e CLIENTS_ENV=<n_clients> -p 8000:8000 --mount source=myvol2,target=/app -it server_fed        
 
 ## To run the docker container of the client 
 
 docker build . -t client_fed        
-docker run -e DATA_ENV=<data_name> -e ROUNDS_ENV=<number of communication rounds> -e EPOCHS_ENV=<n_epochs> -it client_fed       
+docker run -e DATA_ENV=<data_name> -e ROUNDS_ENV=<number of communication rounds> -e EPOCHS_ENV=<n_epochs> --mount source=myvol2,target=/app -it client_fed       
   
   
 ## To test in local network you need to create a network in Docker 
