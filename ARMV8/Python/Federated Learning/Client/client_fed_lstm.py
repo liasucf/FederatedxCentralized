@@ -102,7 +102,7 @@ p.cpu_percent(interval=None)
 
 # ### Charging the data
 ## Loading data incrementaly 
-data = pd.read_csv('Data/'+args.data +'.csv', sep=',')
+data = pd.read_csv('/app/Data/'+args.data +'.csv', sep=',')
 
 
 data['Time'] = pd.to_datetime(data['Time'], format='%Y-%m-%d %H:%M:%S')
@@ -134,8 +134,8 @@ n_input = n_timesteps * n_features
 X = X.reshape((X.shape[0], n_input))
 tscv = TimeSeriesSplit(n_splits=args.communication_rounds)
 generator = tscv.split(X)
-host = "172.18.0.2"
-port = 8000
+host = "54.94.82.121"
+port = 80
 
 #Making a socket for communication and connecting with the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
